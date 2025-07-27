@@ -1,7 +1,7 @@
 // client/src/utils/api.js
 import { auth } from './firebase'; // Import Firebase Auth instance
 
-const API_BASE_URL = 'https://YOUR-RENDER-BACKEND-URL.onrender.com/api'; // NEW: Your deployed Render backend URL
+const API_BASE_URL = 'https://fiverr-clone-marketplace.onrender.com'; // NEW: Your deployed Render backend URL
 
 export const authenticatedFetch = async (endpoint, options = {}) => {
     try {
