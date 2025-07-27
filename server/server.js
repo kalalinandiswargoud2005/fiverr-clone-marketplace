@@ -20,7 +20,7 @@ const adminController = require('./controllers/adminController'); // Import admi
 
 dotenv.config();
 
-const serviceAccount = require('./serviceAccountKey.json');
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -34,7 +34,7 @@ userController.initializeFirebaseAdminForUsers(admin); // Initialize user contro
 adminController.initializeFirebaseAdminForAdmin(admin);
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: process.env.CORS_ORIGIN })); // Allow only your Vercel
 
 const server = http.createServer(app);
 const io = new Server(server, {
