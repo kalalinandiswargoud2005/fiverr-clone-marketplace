@@ -20,8 +20,9 @@ const adminController = require('./controllers/adminController'); // Import admi
 
 dotenv.config();
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-
+const serviceAccountBase64 = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_BASE64;
+if (!serviceAccountBase64) { /* ... */ } // This check is good
+const serviceAccount = JSON.parse(Buffer.from(serviceAccountBase64, 'base64').toString('utf8')); // This parsing is correct
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET_URL
@@ -34,13 +35,18 @@ userController.initializeFirebaseAdminForUsers(admin); // Initialize user contro
 adminController.initializeFirebaseAdminForAdmin(admin);
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: process.env.CORS_ORIGIN })); // Allow only your Vercel
-
+app.use(cors({
+   origin: [
+     "http://localhost:5173", // Allow your local frontend during development
+     process.env.CORS_ORIGIN // Allow your deployed Vercel frontend
+   ],
+   methods: ["GET", "POST", "PUT", "DELETE"] // Ensure all methods are allowed for API calls
+ }));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
-        methods: ["GET", "POST", "PUT"] // Add PUT method for user profile update
+        methods: ["GET", "POST", "PUT", "DELETE"] // Add PUT method for user profile update
     }
 });
 
